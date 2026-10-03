@@ -1,0 +1,69 @@
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.compact {
+  margin-top: 0.8rem;
+}
+
+.secondary,
+.danger,
+.dangerOutline {
+  min-height: 2.55rem;
+  padding: 0.58rem 0.8rem;
+  border-radius: 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.secondary {
+  border: 1px solid var(--border-strong);
+  color: var(--foreground);
+  background: var(--surface);
+}
+
+.danger {
+  border: 1px solid var(--danger);
+  color: #fff;
+  background: var(--danger);
+}
+
+.dangerOutline {
+  border: 1px solid #d7a2a2;
+  color: var(--danger);
+  background: #fff;
+}
+
+.secondary:focus-visible,
+.danger:focus-visible,
+.dangerOutline:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.confirmBox {
+  width: min(100%, 30rem);
+  padding: 0.85rem;
+  border: 1px solid #d7a2a2;
+  border-radius: 0.75rem;
+  background: #fff5f5;
+}
+
+.confirmBox p {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.confirmButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.7rem;
+}

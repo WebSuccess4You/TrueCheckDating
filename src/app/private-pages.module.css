@@ -1,0 +1,104 @@
+.headerBlock {
+  max-width: 48rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.65rem;
+  color: var(--accent-strong);
+  font-size: 0.77rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.headerBlock h1 {
+  margin: 0;
+  font-size: clamp(2.1rem, 7vw, 3.8rem);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+}
+
+.lead {
+  margin: 1rem 0 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.card {
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  letter-spacing: -0.025em;
+}
+
+.card p,
+.card dd {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.card p {
+  margin: 0.65rem 0 0;
+}
+
+.tag {
+  display: inline-flex;
+  margin-top: 1rem;
+  padding: 0.4rem 0.65rem;
+  border-radius: 999px;
+  color: var(--accent-strong);
+  background: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.details {
+  display: grid;
+  gap: 1rem;
+  margin: 1rem 0 0;
+}
+
+.details div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.details dt {
+  color: var(--foreground);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.message {
+  margin-top: 1.25rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--brand-soft-strong);
+  border-radius: 0.72rem;
+  color: var(--brand-strong);
+  background: var(--brand-soft);
+}
+
+@media (min-width: 48rem) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

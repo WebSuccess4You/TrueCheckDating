@@ -1,0 +1,8 @@
+export const CHAT_ANALYZER_PROMPT_KEY = "truecheck-chat-analyzer";
+export const CHAT_ANALYZER_PROMPT_VERSION = "2026-09-27.2";
+export const CHAT_ANALYZER_SCHEMA_VERSION = "1.0";
+export const DEFAULT_OPENAI_CHAT_MODEL = "gpt-5.4-mini";
+export const DEFAULT_OPENAI_TIMEOUT_MS = 45_000;
+export const DEFAULT_OPENAI_MAX_OUTPUT_TOKENS = 2_500;
+export const DEFAULT_ANALYSES_PER_HOUR = 5;
+export const MAX_EVIDENCE_EXCERPT_CHARACTERS = 240;

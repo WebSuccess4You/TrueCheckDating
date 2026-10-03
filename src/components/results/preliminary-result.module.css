@@ -1,0 +1,253 @@
+.results {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.generateForm,
+.summary,
+.components,
+.nextSteps,
+.locked,
+.limitations,
+.version,
+.notReady {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.generateForm button {
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  border: 0;
+  border-radius: 0.75rem;
+  color: #fff;
+  background: var(--brand);
+  font: inherit;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.generateForm button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.generateForm p,
+.explanation,
+.notReady p,
+.notReady li,
+.nextSteps li,
+.locked p,
+.limitations li,
+.version dd {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.generateForm p {
+  margin: 0.6rem 0 0;
+  font-size: 0.82rem;
+}
+
+.errorMessage,
+.outdated {
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.75rem;
+  line-height: 1.5;
+}
+
+.errorMessage {
+  border: 1px solid #e1a6a6;
+  color: #7c1f1f;
+  background: #fff0f0;
+}
+
+.outdated {
+  margin: 0;
+  border: 1px solid #dfc88d;
+  background: #fffaf0;
+}
+
+.resultHeader {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.resultHeader h2,
+.notReady h2 {
+  margin: 0;
+  font-size: clamp(1.75rem, 7vw, 2.6rem);
+  letter-spacing: -0.04em;
+}
+
+.resultHeader > span {
+  align-self: flex-start;
+  padding: 0.4rem 0.65rem;
+  border-radius: 999px;
+  color: var(--brand-strong);
+  background: var(--brand-soft);
+  font-size: 0.75rem;
+  font-weight: 850;
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--accent-strong);
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.metrics,
+.lockedGrid {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.metric,
+.component,
+.lockedGrid span,
+.pricePreview {
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0.8rem;
+  background: var(--surface-soft);
+}
+
+.metric strong,
+.metric span,
+.pricePreview strong,
+.pricePreview span {
+  display: block;
+}
+
+.metric strong {
+  font-size: 1.35rem;
+}
+
+.metric span,
+.pricePreview span {
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.components h3,
+.nextSteps h3,
+.locked h3,
+.limitations h3 {
+  margin: 0;
+}
+
+.componentList {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 0.9rem;
+}
+
+.component {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.component div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.component span,
+.component em {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.component progress {
+  width: 100%;
+  accent-color: var(--brand);
+}
+
+.nextSteps ul,
+.limitations ul,
+.notReady ul {
+  padding-left: 1.25rem;
+}
+
+.locked {
+  border-color: var(--brand-soft-strong);
+  background: linear-gradient(145deg, var(--surface), var(--brand-soft));
+}
+
+.lockedGrid span {
+  position: relative;
+  padding-left: 2.15rem;
+  font-weight: 750;
+}
+
+.lockedGrid span::before {
+  position: absolute;
+  left: 0.85rem;
+  content: "🔒";
+}
+
+.pricePreview {
+  margin-top: 0.8rem;
+}
+
+.limitations {
+  border-color: #dfc88d;
+  background: #fffaf0;
+}
+
+.version summary {
+  cursor: pointer;
+  font-weight: 850;
+}
+
+.version dl {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.version dt {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.version dd {
+  margin: 0.2rem 0 0;
+}
+
+.backLink {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 2.8rem;
+  align-items: center;
+  padding: 0.7rem 0.95rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 0.72rem;
+  background: var(--surface);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+@media (min-width: 42rem) {
+  .metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .lockedGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

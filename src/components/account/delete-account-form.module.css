@@ -1,0 +1,84 @@
+.form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.warning {
+  padding: 0.9rem;
+  border: 1px solid rgba(155, 44, 44, 0.35);
+  border-radius: 0.75rem;
+  color: #7f1d1d;
+  background: #fff4f4;
+  line-height: 1.55;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.label {
+  color: var(--foreground);
+  font-size: 0.9rem;
+  font-weight: 760;
+}
+
+.input {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 0.72rem;
+  color: var(--foreground);
+  background: var(--surface);
+}
+
+.input:focus {
+  border-color: var(--danger);
+  outline: 3px solid rgba(155, 44, 44, 0.2);
+}
+
+.input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.checkbox {
+  display: grid;
+  grid-template-columns: 1.2rem 1fr;
+  gap: 0.65rem;
+  align-items: start;
+  color: var(--muted-strong);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.checkbox input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.15rem;
+  accent-color: var(--danger);
+}
+
+.error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.submit {
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--danger);
+  border-radius: 0.72rem;
+  color: #fff;
+  background: var(--danger);
+  font-weight: 820;
+  cursor: pointer;
+}
+
+.submit:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}

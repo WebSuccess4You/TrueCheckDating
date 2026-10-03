@@ -1,0 +1,260 @@
+.form {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+  padding: clamp(1.05rem, 4vw, 1.55rem);
+  border: 1px solid var(--border);
+  border-radius: 1.1rem;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.statusError,
+.safetyBox,
+.safetyResult {
+  padding: 0.9rem 1rem;
+  border-radius: 0.8rem;
+}
+
+.statusError {
+  border: 1px solid #e2b3b3;
+  color: var(--danger);
+  background: #fff1f1;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.question {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: var(--surface-soft);
+}
+
+.legend {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 1rem;
+  font-weight: 850;
+}
+
+.help,
+.error,
+.characterCount {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.help,
+.characterCount {
+  color: var(--muted);
+}
+
+.error {
+  color: var(--danger);
+  font-weight: 800;
+}
+
+.optionList,
+.resultGrid {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.option {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  padding: 0.72rem;
+  border: 1px solid var(--border);
+  border-radius: 0.72rem;
+  background: var(--surface);
+  color: var(--muted-strong);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.option input,
+.checkbox input {
+  width: 1.08rem;
+  height: 1.08rem;
+  margin-top: 0.12rem;
+  flex: 0 0 auto;
+}
+
+.option:has(input:checked) {
+  border-color: var(--brand-soft-strong);
+  background: var(--brand-soft);
+}
+
+.notes {
+  width: 100%;
+  min-height: 9rem;
+  padding: 0.78rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 0.75rem;
+  color: var(--foreground);
+  background: var(--surface);
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.notes[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.safetyBox,
+.safetyResult {
+  border: 1px solid #d6b969;
+  background: #fff8dd;
+  color: #594716;
+}
+
+.checkbox {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.submit,
+.secondaryAction {
+  min-height: 2.9rem;
+  padding: 0.72rem 1rem;
+  border-radius: 0.72rem;
+  font-weight: 850;
+}
+
+.submit {
+  border: 1px solid var(--brand);
+  color: #fff;
+  background: var(--brand);
+  cursor: pointer;
+}
+
+.submit:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.secondaryAction {
+  border: 1px solid var(--border-strong);
+  color: var(--foreground);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.option input:focus-visible,
+.checkbox input:focus-visible,
+.notes:focus-visible,
+.submit:focus-visible,
+.secondaryAction:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.resultGrid {
+  margin-top: 1.2rem;
+}
+
+.scoreCards {
+  display: grid;
+  gap: 1rem;
+}
+
+.summaryCard,
+.resultCard,
+.protectiveCard,
+.warningCard {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.protectiveCard {
+  border-color: #a9d6b1;
+  background: #effaf1;
+}
+
+.warningCard {
+  border-color: #e2b3b3;
+  background: #fff1f1;
+}
+
+.summaryCard strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 1.35rem;
+}
+
+.resultCard h3,
+.protectiveCard h3,
+.warningCard h3,
+.safetyResult h3 {
+  margin: 0 0 0.65rem;
+  font-size: 1rem;
+}
+
+.resultCard p,
+.protectiveCard p,
+.warningCard p,
+.safetyResult p,
+.summaryCard span,
+.resultCard li,
+.protectiveCard li,
+.warningCard li {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.safetyResult p {
+  color: #594716;
+}
+
+.answerList {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.answerList div {
+  display: grid;
+  gap: 0.18rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.answerList dt {
+  font-weight: 850;
+}
+
+.answerList dd {
+  margin: 0;
+  color: var(--muted);
+}
+
+.preserveWhitespace {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 48rem) {
+  .scoreCards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

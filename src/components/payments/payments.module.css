@@ -1,0 +1,125 @@
+.checkoutForm {
+  display: grid;
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.primaryButton,
+.secondaryButton {
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 750;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.primaryButton {
+  background: var(--color-brand, #143d59);
+  border: 1px solid var(--color-brand, #143d59);
+  color: white;
+}
+
+.secondaryButton {
+  background: white;
+  border: 1px solid #546779;
+  color: #17324d;
+}
+
+.primaryButton:hover:not(:disabled),
+.secondaryButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 0.35rem 1rem rgb(20 61 89 / 14%);
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.error {
+  color: #9c1c1c;
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.accessPanel,
+.activeAccess {
+  border-radius: 1rem;
+  margin-top: 1.5rem;
+  padding: clamp(1.1rem, 3vw, 1.75rem);
+}
+
+.accessPanel {
+  background: #f7fbfd;
+  border: 1px solid #b8ccd8;
+}
+
+.activeAccess {
+  background: #f0faf5;
+  border: 1px solid #85bea0;
+}
+
+.accessPanel h3,
+.activeAccess h3,
+.productCard h4 {
+  margin: 0.2rem 0 0.6rem;
+}
+
+.accessPanel p,
+.activeAccess p,
+.productCard p {
+  line-height: 1.55;
+}
+
+.eyebrow {
+  color: #315d76;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.productGrid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.productCard {
+  background: white;
+  border: 1px solid #d3dfe6;
+  border-radius: 0.85rem;
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.1rem;
+}
+
+.productCard > span {
+  color: #526675;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.productCard > strong {
+  color: #102f46;
+  font-size: 1.85rem;
+}
+
+.smallPrint {
+  color: #526675;
+  font-size: 0.85rem;
+  margin-bottom: 0;
+}
+
+@media (min-width: 720px) {
+  .productGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

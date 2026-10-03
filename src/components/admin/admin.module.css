@@ -1,0 +1,232 @@
+.adminNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 1.4rem 0 0;
+}
+
+.adminNav a {
+  padding: 0.62rem 0.78rem;
+  border: 1px solid var(--border);
+  border-radius: 0.68rem;
+  color: var(--foreground);
+  background: var(--surface);
+  font-size: 0.84rem;
+  font-weight: 780;
+  text-decoration: none;
+}
+
+.metricGrid {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1.7rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.metricCard,
+.panel,
+.notice {
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.metricCard {
+  padding: 1rem;
+}
+
+.metricCard strong {
+  display: block;
+  font-size: clamp(1.7rem, 7vw, 2.5rem);
+  line-height: 1;
+}
+
+.metricCard span {
+  display: block;
+  margin-top: 0.45rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 760;
+}
+
+.panel,
+.notice {
+  margin-top: 1.25rem;
+  padding: 1.15rem;
+}
+
+.panel h2,
+.notice h2 {
+  margin: 0;
+  font-size: 1.12rem;
+}
+
+.panel p,
+.notice p,
+.actionForm p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.notice {
+  border-color: var(--brand-soft-strong);
+  background: var(--brand-soft);
+}
+
+.tableWrap {
+  margin-top: 1rem;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 48rem;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.72rem 0.65rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+  font-size: 0.82rem;
+}
+
+.table th {
+  color: var(--muted-strong);
+  font-size: 0.73rem;
+  text-transform: uppercase;
+}
+
+.code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.badge {
+  display: inline-flex;
+  padding: 0.28rem 0.48rem;
+  border-radius: 999px;
+  color: var(--accent-strong);
+  background: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 820;
+  text-transform: uppercase;
+}
+
+.searchForm,
+.actionForm {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.searchForm label,
+.actionForm label {
+  display: grid;
+  gap: 0.38rem;
+  color: var(--foreground);
+  font-size: 0.82rem;
+  font-weight: 780;
+}
+
+.searchForm input,
+.actionForm select {
+  width: 100%;
+  padding: 0.78rem 0.82rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 0.7rem;
+  color: var(--foreground);
+  background: var(--surface);
+  font: inherit;
+}
+
+.primaryButton,
+.dangerButton,
+.smallButton {
+  width: fit-content;
+  padding: 0.72rem 0.9rem;
+  border: 0;
+  border-radius: 0.7rem;
+  font-weight: 820;
+  cursor: pointer;
+}
+
+.primaryButton {
+  color: white;
+  background: var(--brand);
+}
+
+.dangerButton {
+  color: white;
+  background: #9f2d2d;
+}
+
+.smallButton {
+  padding: 0.48rem 0.62rem;
+  color: var(--foreground);
+  background: var(--accent);
+}
+
+.message,
+.error {
+  margin-top: 1rem;
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.7rem;
+}
+
+.message {
+  color: var(--brand-strong);
+  background: var(--brand-soft);
+}
+
+.error {
+  color: #7a1d1d;
+  background: #fff1f1;
+}
+
+.definitionGrid {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.definitionGrid div {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.definitionGrid dt {
+  font-size: 0.73rem;
+  font-weight: 820;
+  text-transform: uppercase;
+}
+
+.definitionGrid dd {
+  margin: 0.28rem 0 0;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 48rem) {
+  .metricGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .searchForm {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+
+  .definitionGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 68rem) {
+  .metricGrid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}

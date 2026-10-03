@@ -1,0 +1,314 @@
+.generatePanel,
+.report {
+  max-width: 74rem;
+  margin: 1.5rem auto;
+  background: #fff;
+  border: 1px solid #d9e3ea;
+  border-radius: 1.25rem;
+  box-shadow: 0 1rem 2.5rem rgba(16, 44, 67, 0.08);
+}
+.generatePanel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+.generatePanel h2 {
+  margin: 0.2rem 0;
+}
+.generatePanel p {
+  max-width: 48rem;
+  margin: 0.35rem 0;
+  color: #425466;
+}
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+  font-size: 0.76rem;
+  color: #1f667a;
+  margin: 0;
+}
+.primaryButton,
+.printButton {
+  border: 0;
+  border-radius: 0.75rem;
+  background: #103f52;
+  color: #fff;
+  padding: 0.9rem 1.15rem;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.primaryButton:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+.error {
+  color: #9b1c1c !important;
+  font-weight: 700;
+}
+.report {
+  overflow: hidden;
+}
+.reportHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 2rem;
+  background: #edf7f8;
+  border-bottom: 1px solid #d9e3ea;
+}
+.reportHeader h1 {
+  font-size: 2.25rem;
+  margin: 0.25rem 0;
+}
+.reportHeader p {
+  margin: 0.25rem 0;
+  color: #425466;
+}
+.noPrint {
+  max-width: 18rem;
+}
+.noPrint p {
+  font-size: 0.85rem;
+}
+.notice {
+  margin: 1.25rem 2rem 0;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: #fff7d6;
+  border: 1px solid #ead47a;
+  font-weight: 700;
+}
+.summary,
+.section,
+.reportFooter {
+  padding: 1.75rem 2rem;
+  border-bottom: 1px solid #e6edf2;
+}
+.summary h2,
+.section h2 {
+  margin: 0.25rem 0 1rem;
+}
+.notProof {
+  display: inline-block;
+  background: #eaf0f3;
+  border-radius: 99rem;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.metrics div {
+  background: #f5f8fa;
+  border: 1px solid #dfe8ed;
+  border-radius: 0.8rem;
+  padding: 1rem;
+}
+.metrics strong,
+.metrics span {
+  display: block;
+}
+.metrics strong {
+  font-size: 1.55rem;
+}
+.metrics span {
+  color: #52616c;
+  font-size: 0.9rem;
+}
+.evidenceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.evidenceCard,
+.finding,
+.signal {
+  border: 1px solid #dfe8ed;
+  border-radius: 0.85rem;
+  padding: 1rem;
+  background: #fbfcfd;
+}
+.evidenceCard > div,
+.finding header,
+.component {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.evidenceCard span,
+.finding header span {
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: capitalize;
+  color: #52616c;
+}
+.evidenceCard p {
+  margin: 0.65rem 0;
+}
+.evidenceCard small,
+.signal small {
+  color: #5e6d78;
+}
+.findingList,
+.signalList,
+.componentList {
+  display: grid;
+  gap: 1rem;
+}
+.finding dl {
+  margin: 0.8rem 0 0;
+}
+.finding dl div {
+  margin: 0.7rem 0;
+}
+.finding dt {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 800;
+  color: #52616c;
+}
+.finding dd {
+  margin: 0.15rem 0 0;
+}
+.signal p {
+  margin: 0.5rem 0;
+}
+.component {
+  align-items: center;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid #e6edf2;
+}
+.component div span {
+  display: block;
+  color: #52616c;
+  font-size: 0.85rem;
+}
+.actionList {
+  display: grid;
+  gap: 1rem;
+  padding-left: 1.3rem;
+}
+.actionList li {
+  padding-left: 0.4rem;
+}
+.actionList div {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+}
+.actionList span {
+  border-radius: 99rem;
+  background: #e9f5f7;
+  padding: 0.25rem 0.55rem;
+  text-transform: capitalize;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+.actionList p {
+  margin: 0.35rem 0;
+  color: #425466;
+}
+.limitations {
+  padding-left: 1.25rem;
+}
+.limitations li {
+  margin: 0.5rem 0;
+}
+.reportFooter {
+  background: #f4f7f9;
+  border-bottom: 0;
+}
+.reportFooter dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+}
+.reportFooter dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.reportFooter dt {
+  font-weight: 800;
+}
+.reportFooter dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 700px) {
+  .generatePanel,
+  .reportHeader {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .generatePanel {
+    padding: 1rem;
+  }
+  .reportHeader,
+  .summary,
+  .section,
+  .reportFooter {
+    padding: 1.25rem;
+  }
+  .metrics,
+  .evidenceGrid,
+  .reportFooter dl {
+    grid-template-columns: 1fr;
+  }
+  .reportHeader h1 {
+    font-size: 1.8rem;
+  }
+  .component {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .noPrint {
+    max-width: none;
+  }
+}
+@media print {
+  .noPrint,
+  .notice {
+    display: none !important;
+  }
+  .report {
+    max-width: none;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .reportHeader,
+  .summary,
+  .section,
+  .reportFooter {
+    break-inside: avoid;
+    padding: 14pt 16pt;
+  }
+  .finding,
+  .signal,
+  .evidenceCard {
+    break-inside: avoid;
+  }
+  .reportHeader {
+    background: #fff;
+  }
+  .section {
+    page-break-inside: auto;
+  }
+  .section h2 {
+    break-after: avoid;
+  }
+  .reportFooter {
+    background: #fff;
+  }
+}

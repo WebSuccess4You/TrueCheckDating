@@ -1,0 +1,84 @@
+.shell {
+  min-height: 100vh;
+  background: var(--background);
+}
+
+.header {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.headerInner {
+  display: flex;
+  width: min(100% - 1.25rem, var(--site-width));
+  min-height: 4.5rem;
+  margin: 0 auto;
+  padding: 0.55rem 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.brand {
+  flex: 0 0 auto;
+  color: var(--brand);
+  font-size: 1rem;
+  font-weight: 880;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem 0.65rem;
+}
+
+.nav a {
+  color: var(--muted-strong);
+  font-size: 0.8rem;
+  font-weight: 720;
+  text-decoration: none;
+}
+
+.logout {
+  padding: 0.52rem 0.65rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 0.62rem;
+  color: var(--foreground);
+  background: var(--surface);
+  font-size: 0.78rem;
+  font-weight: 780;
+  cursor: pointer;
+}
+
+.main {
+  width: min(100% - 2rem, var(--site-width));
+  margin: 0 auto;
+  padding: clamp(2.2rem, 6vw, 4rem) 0;
+}
+
+.userLine {
+  display: none;
+  max-width: 14rem;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 56rem) {
+  .userLine {
+    display: block;
+  }
+  .nav {
+    gap: 0.8rem;
+  }
+  .nav a {
+    font-size: 0.88rem;
+  }
+}
