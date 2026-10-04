@@ -1,3 +1,4 @@
+﻿import { calculateCheckCompletion } from "@/lib/cases/progress";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -51,12 +52,12 @@ export default async function CaseOverviewPage({
   const imageReviewed =
     imageCheck?.status === "completed" &&
     imageCheck.result_category !== "unclear";
-  const completedChecks = [
-    latestChatSubmission?.status === "analysis_completed",
-    profileCheck?.status === "completed",
-    imageReviewed,
-    videoCheck?.status === "completed",
-  ].filter(Boolean).length;
+  const completionPercent = calculateCheckCompletion(
+    latestChatSubmission,
+    profileCheck,
+    imageCheck,
+    videoCheck,
+  );
 
   return (
     <PrivateShell email={user.email}>
@@ -93,15 +94,15 @@ export default async function CaseOverviewPage({
 
       <div className={styles.summaryGrid} aria-label="Case progress">
         <article className={styles.summaryCard}>
-          <strong>{completedChecks * 25}%</strong>
+          <strong>{completionPercent}%</strong>
           <span>Checks complete</span>
         </article>
         <article className={styles.summaryCard}>
-          <strong>{caseRecord.latest_concern_level ?? "—"}</strong>
+          <strong>{caseRecord.latest_concern_level ?? "â€”"}</strong>
           <span>Concern level not calculated</span>
         </article>
         <article className={styles.summaryCard}>
-          <strong>{caseRecord.latest_risk_score ?? "—"}</strong>
+          <strong>{caseRecord.latest_risk_score ?? "â€”"}</strong>
           <span>Risk indicator not calculated</span>
         </article>
       </div>
@@ -185,7 +186,7 @@ export default async function CaseOverviewPage({
             </p>
             <span className={styles.stepStatus}>
               {profileCheck?.status === "completed"
-                ? `Completed — ${profileCheck.component_score ?? "—"}/100`
+                ? `Completed â€” ${profileCheck.component_score ?? "â€”"}/100`
                 : profileCheck
                   ? "Progress saved"
                   : "Ready to start"}
@@ -207,7 +208,7 @@ export default async function CaseOverviewPage({
             </p>
             <span className={styles.stepStatus}>
               {imageReviewed
-                ? `Completed — ${imageCheck.component_score ?? "—"}/100`
+                ? `Completed â€” ${imageCheck.component_score ?? "â€”"}/100`
                 : imageCheck
                   ? "Progress saved"
                   : "Ready to start"}
@@ -230,7 +231,7 @@ export default async function CaseOverviewPage({
             </p>
             <span className={styles.stepStatus}>
               {videoCheck?.status === "completed"
-                ? `Completed — ${videoCheck.component_score ?? "—"}/100`
+                ? `Completed â€” ${videoCheck.component_score ?? "â€”"}/100`
                 : videoCheck
                   ? "Progress saved"
                   : "Ready to start"}
@@ -253,7 +254,7 @@ export default async function CaseOverviewPage({
             </p>
             <span className={styles.stepStatus}>
               {latestAssessment?.status === "preliminary"
-                ? `${latestAssessment.concern_level} — ${latestAssessment.overall_score ?? "—"}/100`
+                ? `${latestAssessment.concern_level} â€” ${latestAssessment.overall_score ?? "â€”"}/100`
                 : latestAssessment
                   ? "More evidence needed"
                   : "Ready to calculate"}
