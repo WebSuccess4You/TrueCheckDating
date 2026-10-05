@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-
+import { useState, useSyncExternalStore } from "react";
 import { MenuIcon, ShieldCheckIcon } from "@/components/icons";
 import { ButtonLink } from "@/components/ui/button-link";
 
@@ -13,9 +12,12 @@ const navItems = [
   { href: "/pricing", label: "Pricing" },
   { href: "/privacy", label: "Privacy" },
 ];
-
+const subscribe = () => () => {};
+const getSnapshot = () => true;
+const getServerSnapshot = () => false;
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const ready = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   return (
     <header className={styles.header}>
@@ -36,6 +38,7 @@ export function SiteHeader() {
           aria-expanded={open}
           aria-label="Toggle navigation"
           className={styles.menuButton}
+          disabled={!ready}
           onClick={() => setOpen((value) => !value)}
           type="button"
         >

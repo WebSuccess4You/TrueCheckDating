@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("public privacy summary describes account deletion", async ({ page }) => {
-  await page.goto("/privacy");
+  await page.goto("/privacy", { waitUntil: "domcontentloaded" });
   await expect(
     page.getByRole("heading", { name: "Deletion", exact: true }),
   ).toBeVisible();

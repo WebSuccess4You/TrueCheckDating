@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("registration requires adult, terms, and privacy consent", async ({
   page,
 }) => {
-  await page.goto("/signup");
+  await page.goto("/signup", { waitUntil: "domcontentloaded" });
 
   await expect(
     page.getByRole("heading", {

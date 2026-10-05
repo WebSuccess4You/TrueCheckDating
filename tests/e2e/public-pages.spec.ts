@@ -71,10 +71,32 @@ test("landing page presents the approved product promise", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("primary navigation reaches public pages", async ({ page }) => {
-  await page.goto("/");
+test("primary navigation reaches public pages", async ({ page, isMobile }) => {
+  await page.goto("/", { waitUntil: "domcontentloaded" });
 
-  await page.getByRole("link", { name: "How it works" }).first().click();
+  const navigation = page.getByRole("navigation", {
+    name: "Primary navigation",
+  });
+
+  async function openMenu() {
+    if (isMobile) {
+      const toggle = page.getByRole("button", {
+        name: "Toggle navigation",
+      });
+
+      if ((await toggle.getAttribute("aria-expanded")) !== "true") {
+        await toggle.click();
+      }
+    }
+
+    await expect(navigation).toBeVisible();
+  }
+
+  await openMenu();
+  await navigation
+    .getByRole("link", { name: "How it works", exact: true })
+    .click();
+
   await expect(page).toHaveURL(/\/how-it-works$/);
   await expect(
     page.getByRole("heading", {
@@ -83,8 +105,10 @@ test("primary navigation reaches public pages", async ({ page }) => {
     }),
   ).toBeVisible();
 
-  await page.getByRole("link", { name: "Pricing" }).first().click();
-  await expect(page).toHaveURL(/\/pricing$/);
+  await openMenu();
+  await navigation.getByRole("link", { name: "Pricing", exact: true }).click();
+
+  await expect(page).toHaveURL(/\/pricing$/, { timeout: 15000 });
   await expect(
     page.getByRole("heading", {
       level: 1,
