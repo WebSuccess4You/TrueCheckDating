@@ -355,7 +355,11 @@ async function synchronizeSubscription(
         status: subscription.status,
         current_period_start: period.start,
         current_period_end: period.end,
-        cancel_at_period_end: subscription.cancel_at_period_end,
+        cancel_at_period_end:
+          subscription.cancel_at_period_end ||
+          (subscription.cancel_at != null &&
+            period.end != null &&
+            unixToIso(subscription.cancel_at) === period.end),
         updated_at: new Date().toISOString(),
       },
       { onConflict: "provider_subscription_id" },
