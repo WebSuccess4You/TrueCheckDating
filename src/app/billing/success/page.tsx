@@ -17,9 +17,7 @@ export default async function BillingSuccessPage({
 }) {
   const user = await requireUser();
   const query = await searchParams;
-  const entitlement = query.caseId
-    ? await getEntitlementSummary(user.id, query.caseId)
-    : null;
+  const entitlement = await getEntitlementSummary(user.id, query.caseId);
 
   return (
     <PrivateShell email={user.email}>
@@ -40,7 +38,11 @@ export default async function BillingSuccessPage({
         {entitlement?.hasFullReportAccess ? (
           <>
             <h2>Entitlement active</h2>
-            <p>Your secure report access is now recorded.</p>
+            <p>
+              {query.caseId
+                ? "Your secure report access is now recorded."
+                : "Your membership access is now recorded."}
+            </p>
           </>
         ) : (
           <>

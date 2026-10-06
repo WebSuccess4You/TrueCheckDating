@@ -7,23 +7,25 @@ import type { EntitlementSummary, SubscriptionSummary } from "./types";
 
 export async function getEntitlementSummary(
   userId: string,
-  caseId: string,
+  caseId?: string,
 ): Promise<EntitlementSummary> {
   const supabase = await createClient();
   const now = new Date().toISOString();
 
   const [{ data: caseEntitlements }, { data: memberships }] = await Promise.all(
     [
-      supabase
-        .from("entitlements")
-        .select("ends_at,status,usage_limit,usage_count")
-        .eq("user_id", userId)
-        .eq("case_id", caseId)
-        .eq("entitlement_type", "case_full_report")
-        .eq("status", "active")
-        .or(`ends_at.is.null,ends_at.gt.${now}`)
-        .order("created_at", { ascending: false })
-        .limit(1),
+      caseId
+        ? supabase
+            .from("entitlements")
+            .select("ends_at,status,usage_limit,usage_count")
+            .eq("user_id", userId)
+            .eq("case_id", caseId)
+            .eq("entitlement_type", "case_full_report")
+            .eq("status", "active")
+            .or(`ends_at.is.null,ends_at.gt.${now}`)
+            .order("created_at", { ascending: false })
+            .limit(1)
+        : Promise.resolve({ data: [] }),
       supabase
         .from("entitlements")
         .select("ends_at,status,usage_limit,usage_count")
