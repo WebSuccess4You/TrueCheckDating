@@ -14,7 +14,7 @@ export type ReportEvidenceItem = {
     | "Profile Consistency Check"
     | "Video Call Verifier"
     | "Guided Reverse Image Checker";
-  status: "Reviewed" | "Not available";
+  status: "Reviewed" | "Completed — excluded from scoring" | "Not available";
   reviewedAt: string | null;
   version: string | null;
   description: string;

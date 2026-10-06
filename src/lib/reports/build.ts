@@ -202,7 +202,14 @@ export function buildFinalReportBody({
       {
         source: "Profile Consistency Check",
         status:
-          profileCheck?.status === "completed" ? "Reviewed" : "Not available",
+          profileCheck?.status !== "completed"
+            ? "Not available"
+            : assessment.component_scores.some(
+                  (component) =>
+                    component.source === "profile" && component.included,
+                )
+              ? "Reviewed"
+              : "Completed — excluded from scoring",
         reviewedAt: profileCheck?.completed_at ?? null,
         version: profileCheck?.version ?? null,
         description:
@@ -213,7 +220,14 @@ export function buildFinalReportBody({
       {
         source: "Video Call Verifier",
         status:
-          videoCheck?.status === "completed" ? "Reviewed" : "Not available",
+          videoCheck?.status !== "completed"
+            ? "Not available"
+            : assessment.component_scores.some(
+                  (component) =>
+                    component.source === "video" && component.included,
+                )
+              ? "Reviewed"
+              : "Completed — excluded from scoring",
         reviewedAt: videoCheck?.completed_at ?? null,
         version: videoCheck?.version ?? null,
         description:
