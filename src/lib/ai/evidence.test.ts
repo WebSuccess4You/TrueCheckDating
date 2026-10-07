@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   excerptAppearsInTranscript,
   validateEvidenceExcerpts,
+  validateScoreEvidence,
 } from "./evidence";
 import type { ChatAnalysisOutput } from "./schema";
 
@@ -55,7 +56,7 @@ describe("evidence validation", () => {
     expect(
       excerptAppearsInTranscript(
         "Taylor: I won't send money - not now.",
-        "Taylor: I won’t send money — not now.",
+        "Taylor: I won\u2019t send money \u2014 not now.",
       ),
     ).toBe(true);
   });
@@ -71,22 +72,25 @@ describe("evidence validation", () => {
 
   it("accepts a correct speaker label prepended to a mid-turn quote", () => {
     const conversation =
-      "Alex: Maybe later. I have an urgent bill today. Could you send me $200? Please don’t tell anyone. Taylor: I won’t send money.";
+      "Alex: Maybe later. I have an urgent bill today. Could you send me $200? Please don\u2019t tell anyone. Taylor: I won\u2019t send money.";
+
     expect(
       excerptAppearsInTranscript(
-        "Alex: Could you send me $200? Please don’t tell anyone.",
+        "Alex: Could you send me $200? Please don\u2019t tell anyone.",
         conversation,
       ),
     ).toBe(true);
+
     expect(
       excerptAppearsInTranscript(
-        "Taylor: Could you send me $200? Please don’t tell anyone.",
+        "Taylor: Could you send me $200? Please don\u2019t tell anyone.",
         conversation,
       ),
     ).toBe(false);
+
     expect(
       excerptAppearsInTranscript(
-        "Alex: Could you send me $2,000? Please don’t tell anyone.",
+        "Alex: Could you send me $2,000? Please don\u2019t tell anyone.",
         conversation,
       ),
     ).toBe(false);
@@ -114,9 +118,93 @@ describe("evidence validation", () => {
         },
       ],
     };
+
     expect(validateEvidenceExcerpts(invalid, transcript)).toEqual({
       valid: false,
       invalidExcerpt: "Wire the money to my account.",
     });
+  });
+});
+
+const zeroScores: ChatAnalysisOutput["category_scores"] = {
+  communication_manipulation: 0,
+  financial_pressure: 0,
+  identity_consistency: 0,
+  verification_behavior: 0,
+  urgency_and_isolation: 0,
+};
+
+describe("score evidence validation", () => {
+  it("accepts a score supported by a matching warning category", () => {
+    expect(
+      validateScoreEvidence({
+        ...result,
+        category_scores: {
+          ...zeroScores,
+          financial_pressure: 90,
+        },
+      }),
+    ).toBe(true);
+  });
+
+  it.each([
+    "communication_manipulation",
+    "financial_pressure",
+    "identity_consistency",
+    "verification_behavior",
+    "urgency_and_isolation",
+  ] as const)("rejects an unsupported score for %s", (category) => {
+    expect(
+      validateScoreEvidence({
+        ...result,
+        risk_score: 0,
+        concern_level: "low",
+        red_flags: [],
+        category_scores: {
+          ...zeroScores,
+          [category]: 1,
+        },
+      }),
+    ).toBe(false);
+  });
+
+  it("rejects unrelated category scores despite a financial warning", () => {
+    expect(validateScoreEvidence(result)).toBe(false);
+  });
+
+  it("accepts zero scores and low concern with no warnings", () => {
+    expect(
+      validateScoreEvidence({
+        ...result,
+        risk_score: 0,
+        concern_level: "low",
+        red_flags: [],
+        category_scores: { ...zeroScores },
+      }),
+    ).toBe(true);
+  });
+
+  it("rejects a nonzero overall risk score with no warnings", () => {
+    expect(
+      validateScoreEvidence({
+        ...result,
+        risk_score: 1,
+        concern_level: "low",
+        red_flags: [],
+        category_scores: { ...zeroScores },
+      }),
+    ).toBe(false);
+  });
+
+  it("rejects elevated concern with no warnings even when scores are zero", () => {
+    expect(
+      validateScoreEvidence({
+        ...result,
+        risk_score: 0,
+        concern_level: "high",
+        red_flags: [],
+        category_scores: { ...zeroScores },
+      }),
+    ).toBe(false);
   });
 });

@@ -12,7 +12,10 @@ import {
   CHAT_ANALYZER_PROMPT_VERSION,
   CHAT_ANALYZER_SCHEMA_VERSION,
 } from "@/lib/ai/constants";
-import { validateEvidenceExcerpts } from "@/lib/ai/evidence";
+import {
+  validateEvidenceExcerpts,
+  validateScoreEvidence,
+} from "@/lib/ai/evidence";
 import { readableConcernLevel } from "@/lib/ai/format";
 import {
   ChatAnalysisProviderError,
@@ -194,7 +197,12 @@ export async function analyzeChatSubmissionAction(
         evidenceValidation.invalidExcerpt,
       );
     }
-
+    if (!validateScoreEvidence(providerResult.output)) {
+      throw new ChatAnalysisProviderError(
+        "invalid_output_structure",
+        "The analysis scores were not supported by its warning signs.",
+      );
+    }
     const completedAt = new Date().toISOString();
     const result = providerResult.output;
     const { error: updateError } = await admin

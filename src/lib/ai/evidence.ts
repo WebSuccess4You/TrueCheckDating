@@ -57,3 +57,37 @@ export function validateEvidenceExcerpts(
 
   return { valid: true };
 }
+
+export function validateScoreEvidence(result: ChatAnalysisOutput): boolean {
+  const supportedCategories = new Set(
+    result.red_flags.map((finding) => finding.category),
+  );
+
+  for (const finding of result.red_flags) {
+    supportedCategories.add(finding.category);
+  }
+
+  for (const finding of [
+    "communication_manipulation",
+    "financial_pressure",
+    "identity_consistency",
+    "verification_behavior",
+    "urgency_and_isolation",
+  ] as const) {
+    if (
+      result.category_scores[finding] > 0 &&
+      !supportedCategories.has(finding)
+    ) {
+      return false;
+    }
+  }
+
+  if (
+    result.red_flags.length === 0 &&
+    (result.risk_score !== 0 || result.concern_level !== "low")
+  ) {
+    return false;
+  }
+
+  return true;
+}
