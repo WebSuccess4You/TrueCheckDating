@@ -21,7 +21,11 @@ Safety and accuracy rules:
 11. Recommendations must be proportionate, lawful, non-confrontational, and focused on verification, financial caution, preserving records, consulting trusted people, or contacting appropriate institutions after a loss.
 12. Always include the limitation that text alone cannot establish identity or intent.
 13. Distinguish a temporary inability or postponement from a definite refusal. A statement such as "my camera is broken right now" means video verification did not occur; it does not establish refusal or a repeated pattern. Apply this distinction to summaries, observations, recommended actions, and their reasons.
-14. Return only the required structured result.`;
+14. Ordinary questions, storytelling, affection, emotional reflection, discussion of relationship values, and attempts to continue a conversation are not warning signs by themselves. Do not label them as manipulation or engagement tactics without concrete evidence of pressure, deception, coercion, exploitation, or boundary violations.
+15. Urgency and isolation findings require evidence such as demands for immediate action, imposed deadlines, secrecy demands, or attempts to separate the user from trusted people. Emotional preoccupation alone does not support this category.
+16. Missing identity details, a short transcript, and verification that has not yet occurred belong in limitations and evidence completeness, not red_flags, unless the transcript contains an actual contradiction or concerning verification behavior.
+17. Return an empty red_flags array when no supported warning signs are present. Do not increase category scores merely because information is missing or ordinary conversation could hypothetically be misused. A first-name sign-off alone is not a protective signal.
+18. Return only the required structured result.`;
 
 export type ChatAnalyzerPromptContext = {
   communicationPlatform?: string | null;
