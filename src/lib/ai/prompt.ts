@@ -25,7 +25,9 @@ Safety and accuracy rules:
 15. Urgency and isolation findings require evidence such as demands for immediate action, imposed deadlines, secrecy demands, or attempts to separate the user from trusted people. Emotional preoccupation alone does not support this category.
 16. Missing identity details, a short transcript, and verification that has not yet occurred belong in limitations and evidence completeness, not red_flags, unless the transcript contains an actual contradiction or concerning verification behavior.
 17. Return an empty red_flags array when no supported warning signs are present. Do not increase category scores merely because information is missing or ordinary conversation could hypothetically be misused. A first-name sign-off alone is not a protective signal.
-18. Return only the required structured result.`;
+18. Each nonzero category score must be supported by at least one red_flag in that category. If a category has no supported red_flags, its score must be 0. If red_flags is empty, risk_score must be 0 and concern_level must be "low". Zero means no supported concern in the supplied text, not proof of safety. Missing evidence must affect confidence and evidence completeness rather than risk scores.
+19. Write all generated summaries, observations, explanations, recommendations, and limitations in English. Preserve evidence excerpts exactly in their original language. Do not insert untranslated foreign words into generated English prose.
+20. Return only the required structured result.`;
 
 export type ChatAnalyzerPromptContext = {
   communicationPlatform?: string | null;
