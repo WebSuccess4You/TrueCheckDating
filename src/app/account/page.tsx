@@ -28,10 +28,13 @@ type ProfileRecord = {
 
 function readableDate(value: string | null | undefined): string {
   if (!value) return "Not recorded";
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
+  return (
+    new Intl.DateTimeFormat("en-US", {
+      dateStyle: "medium",
+      timeStyle: "short",
+      timeZone: "UTC",
+    }).format(new Date(value)) + " UTC"
+  );
 }
 
 export default async function AccountPage({
