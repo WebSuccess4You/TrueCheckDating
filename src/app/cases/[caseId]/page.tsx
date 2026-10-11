@@ -99,11 +99,19 @@ export default async function CaseOverviewPage({
         </article>
         <article className={styles.summaryCard}>
           <strong>{caseRecord.latest_concern_level ?? "â€”"}</strong>
-          <span>Concern level not calculated</span>
+          <span>
+            {caseRecord.latest_concern_level != null
+              ? "Concern level"
+              : "Concern level not calculated"}
+          </span>
         </article>
         <article className={styles.summaryCard}>
           <strong>{caseRecord.latest_risk_score ?? "â€”"}</strong>
-          <span>Risk indicator not calculated</span>
+          <span>
+            {caseRecord.latest_risk_score != null
+              ? "Risk indicator"
+              : "Risk indicator not calculated"}
+          </span>
         </article>
       </div>
 
