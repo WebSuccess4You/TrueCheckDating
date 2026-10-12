@@ -9,7 +9,7 @@ import { getStripeEnvironment } from "@/lib/server-env";
 
 import {
   ACTIVE_SUBSCRIPTION_STATUSES,
-  FULL_REPORT_REANALYSIS_LIMIT,
+  FULL_REPORT_GENERATION_LIMIT,
   FULL_REPORT_WINDOW_DAYS,
   MEMBERSHIP_ANALYSIS_LIMIT,
   MONTHLY_MEMBERSHIP_PRODUCT_CODE,
@@ -203,7 +203,7 @@ async function fulfillCheckoutSession(
       source_id: payment.id,
       starts_at: new Date().toISOString(),
       ends_at: addDaysIso(FULL_REPORT_WINDOW_DAYS),
-      usage_limit: FULL_REPORT_REANALYSIS_LIMIT,
+      usage_limit: FULL_REPORT_GENERATION_LIMIT,
       usage_count: 0,
       status: "active",
       metadata: { checkout_session_id: session.id },

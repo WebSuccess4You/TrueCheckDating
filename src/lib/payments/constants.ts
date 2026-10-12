@@ -12,7 +12,7 @@ export const ACTIVE_SUBSCRIPTION_STATUSES = new Set([
   "past_due",
 ]);
 
-export const FULL_REPORT_REANALYSIS_LIMIT = 3;
+export const FULL_REPORT_GENERATION_LIMIT = 4;
 export const FULL_REPORT_WINDOW_DAYS = 30;
 export const MEMBERSHIP_ACTIVE_CASE_LIMIT = 5;
 export const MEMBERSHIP_ANALYSIS_LIMIT = 20;
