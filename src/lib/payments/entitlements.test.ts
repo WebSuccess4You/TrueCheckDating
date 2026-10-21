@@ -97,3 +97,26 @@ describe("four-report purchase allowance", () => {
     );
   });
 });
+
+describe("Build 17 membership fallback", () => {
+  it("uses membership when an active individual purchase is exhausted", () => {
+    const summary = summarizeEntitlements({
+      caseEntitlement: {
+        ...active,
+        usage_limit: 4,
+        usage_count: 4,
+      },
+      membership: {
+        ...active,
+        usage_limit: 20,
+        usage_count: 6,
+      },
+      now,
+    });
+
+    expect(summary.hasFullReportAccess).toBe(true);
+    expect(summary.source).toBe("membership");
+    expect(summary.usageLimit).toBe(20);
+    expect(summary.usageCount).toBe(6);
+  });
+});

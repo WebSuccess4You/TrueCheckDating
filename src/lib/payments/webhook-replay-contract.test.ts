@@ -47,7 +47,8 @@ describe("Stripe webhook replay boundary", () => {
     );
     expect(report).toContain("existingEntitlement");
     expect(report).not.toContain(".update(entitlementPayload)");
-    expect(membership).toContain("usage_count: 0");
+    expect(membership).toContain("synchronize_membership_subscription");
+    expect(membership).not.toContain("usage_count: 0");
     expect(membership).not.toContain("existingEntitlement?.usage_count");
   });
 });

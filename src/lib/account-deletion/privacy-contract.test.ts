@@ -38,6 +38,6 @@ describe("Build 13 privacy and deletion contract", () => {
   it("blocks non-active accounts and ignores late Stripe events for deleted users", () => {
     expect(authActions).toContain('profile.account_status !== "active"');
     expect(webhook).toContain("if (!existingProfile)");
-    expect(webhook).toContain("deleted the account");
+    expect(webhook).toMatch(/if \(!existingProfile\) \{\s*return null;\s*\}/);
   });
 });

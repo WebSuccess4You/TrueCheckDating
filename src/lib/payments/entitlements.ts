@@ -24,12 +24,18 @@ export function summarizeEntitlements({
   membership: EntitlementRecord | null | undefined;
   now?: number;
 }): EntitlementSummary {
-  const activeCaseEntitlement = isEntitlementCurrent(caseEntitlement, now)
-    ? caseEntitlement
-    : null;
-  const activeMembership = isEntitlementCurrent(membership, now)
-    ? membership
-    : null;
+  const activeCaseEntitlement =
+    isEntitlementCurrent(caseEntitlement, now) &&
+    (caseEntitlement.usage_limit === null ||
+      caseEntitlement.usage_count < caseEntitlement.usage_limit)
+      ? caseEntitlement
+      : null;
+  const activeMembership =
+    isEntitlementCurrent(membership, now) &&
+    (membership.usage_limit === null ||
+      membership.usage_count < membership.usage_limit)
+      ? membership
+      : null;
 
   return {
     hasFullReportAccess: Boolean(activeCaseEntitlement || activeMembership),
