@@ -13,6 +13,24 @@ const protectedPrefixes = [
 
 export async function updateSession(request: NextRequest) {
   if (!isSupabaseConfigured()) {
+    const isProtected = protectedPrefixes.some(
+      (prefix) =>
+        request.nextUrl.pathname === prefix ||
+        request.nextUrl.pathname.startsWith(`${prefix}/`),
+    );
+    if (isProtected) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/login";
+      loginUrl.searchParams.set(
+        "next",
+        safeNextPath(`${request.nextUrl.pathname}${request.nextUrl.search}`),
+      );
+      loginUrl.searchParams.set(
+        "message",
+        "Please log in to open your private account.",
+      );
+      return NextResponse.redirect(loginUrl);
+    }
     return NextResponse.next({ request });
   }
 
