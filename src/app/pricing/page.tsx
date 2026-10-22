@@ -33,6 +33,7 @@ const products = [
     suffix: "test price",
     summary: "A complete combined report for one private case.",
     items: [
+      "One initial report plus three updates within 30 days (four generations total)",
       "Detailed component findings",
       "Confidence and evidence completeness",
       "Recommended next steps",
@@ -48,9 +49,10 @@ const products = [
     suffix: "/ month",
     summary: "For several cases or repeated analyses.",
     items: [
-      "Multiple active cases",
-      "Repeated analyses within usage limits",
-      "Full reports and updates",
+      "Up to five active cases",
+      "20 successful AI Chat Analyses per billing period",
+      "20 Full Report generations per billing period",
+      "Separate report and AI analysis allowances",
       "Billing management",
     ],
     cta: "Start with an account",
@@ -106,7 +108,7 @@ export default function PricingPage() {
           <strong>No automatic proof or guaranteed outcome</strong>
           <p>
             Payment unlocks a more complete analysis and report. It does not
-            purchase certainty about another person’s identity, intent, or
+            purchase certainty about another person&rsquo;s identity, intent, or
             safety.
           </p>
         </div>
