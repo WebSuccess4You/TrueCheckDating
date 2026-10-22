@@ -123,6 +123,26 @@ export async function analyzeChatSubmissionAction(
     return setupMessage();
   }
 
+  try {
+    const { error: recoveryError } = await admin.rpc(
+      "recover_expired_membership_analysis_reservations",
+      { p_user_id: user.id },
+    );
+    if (recoveryError) {
+      return {
+        status: "error",
+        message:
+          "The analyzer could not prepare your analysis allowance. Please try again shortly.",
+      };
+    }
+  } catch {
+    return {
+      status: "error",
+      message:
+        "The analyzer could not prepare your analysis allowance. Please try again shortly.",
+    };
+  }
+
   const requestId = randomUUID();
   const { data: started, error: startError } = await admin.rpc(
     "start_chat_analysis_with_limit",
@@ -149,6 +169,20 @@ export async function analyzeChatSubmissionAction(
     };
   }
 
+  if (startResult.outcome === "no_access") {
+    return {
+      status: "error",
+      message:
+        "Your membership is not currently eligible for AI Chat Analysis. Please check your subscription status and billing period.",
+    };
+  }
+  if (startResult.outcome === "monthly_limited") {
+    return {
+      status: "error",
+      message:
+        "Your membership has used all 20 AI Chat Analyses for this billing period. Your allowance resets when your next billing period begins.",
+    };
+  }
   if (startResult.outcome === "limited") {
     return {
       status: "error",
@@ -169,6 +203,8 @@ export async function analyzeChatSubmissionAction(
     };
   }
   const createdAnalysis = { id: startResult.analysis_id };
+  let analysisFinalized = false;
+  let finalizationAttempted = false;
 
   await admin
     .from("chat_submissions")
@@ -205,36 +241,32 @@ export async function analyzeChatSubmissionAction(
     }
     const completedAt = new Date().toISOString();
     const result = providerResult.output;
-    const { error: updateError } = await admin
-      .from("chat_analyses")
-      .update({
-        status: "completed",
-        risk_score: result.risk_score,
-        concern_level: result.concern_level,
-        confidence_score: result.confidence_score,
-        confidence_level: result.confidence_level,
-        evidence_completeness: result.evidence_completeness,
-        summary: result.summary,
-        category_scores: result.category_scores,
-        red_flags: result.red_flags,
-        protective_signals: result.protective_signals,
-        recommended_actions: result.recommended_actions,
-        limitations: result.limitations,
-        model_identifier: providerResult.model,
-        input_token_count: providerResult.inputTokens,
-        output_token_count: providerResult.outputTokens,
-        provider_response_id: providerResult.providerResponseId,
-        completed_at: completedAt,
-        error_code: null,
-      })
-      .eq("id", createdAnalysis.id);
+    const atomicResult = {
+      ...result,
+      model_identifier: providerResult.model,
+      input_token_count: providerResult.inputTokens,
+      output_token_count: providerResult.outputTokens,
+      provider_response_id: providerResult.providerResponseId,
+    };
+    finalizationAttempted = true;
+    const { data: finalizationOutcome, error: updateError } = await admin.rpc(
+      "finalize_membership_analysis_reservation",
+      {
+        p_analysis_id: createdAnalysis.id,
+        p_user_id: user.id,
+        p_final_status: "completed",
+        p_analysis_result: atomicResult,
+      },
+    );
 
-    if (updateError) {
+    if (updateError || finalizationOutcome !== "finalized") {
       throw new ChatAnalysisProviderError(
         "provider_error",
         "The validated analysis could not be saved.",
       );
     }
+
+    analysisFinalized = true;
 
     await Promise.all([
       admin
@@ -267,6 +299,10 @@ export async function analyzeChatSubmissionAction(
       throw error;
     }
 
+    if (analysisFinalized || finalizationAttempted) {
+      throw error;
+    }
+
     const providerError =
       error instanceof ChatAnalysisProviderError
         ? error
@@ -275,21 +311,30 @@ export async function analyzeChatSubmissionAction(
             "The analysis could not be completed.",
           );
 
-    await Promise.all([
-      admin
-        .from("chat_analyses")
-        .update({
-          status: providerError.code === "refused" ? "rejected" : "failed",
-          error_code: providerError.code,
-          completed_at: new Date().toISOString(),
-        })
-        .eq("id", createdAnalysis.id),
+    const [failureFinalization, submissionFailureUpdate] = await Promise.all([
+      admin.rpc("finalize_membership_analysis_reservation", {
+        p_analysis_id: createdAnalysis.id,
+        p_user_id: user.id,
+        p_final_status:
+          providerError.code === "refused" ? "rejected" : "failed",
+        p_analysis_result: { error_code: providerError.code },
+      }),
       admin
         .from("chat_submissions")
         .update({ status: "analysis_failed" })
         .eq("id", submissionId)
         .eq("auth_user_id", user.id),
     ]);
+
+    if (
+      failureFinalization.error ||
+      failureFinalization.data !== "finalized" ||
+      submissionFailureUpdate.error
+    ) {
+      throw new Error(
+        "Analysis failure finalization or submission update failed.",
+      );
+    }
 
     // Build 14 records only sanitized operational metadata. The transcript,
     // prompt, provider body, and private case details are never copied here.
@@ -315,7 +360,7 @@ export async function analyzeChatSubmissionAction(
     return {
       status: "error",
       message: providerError.ownerVisibleEvidence
-        ? `${providerMessage(providerError.code)} Rejected quote: “${providerError.ownerVisibleEvidence}”`
+        ? `${providerMessage(providerError.code)} Rejected quote: "${providerError.ownerVisibleEvidence}"`
         : providerMessage(providerError.code),
     };
   }

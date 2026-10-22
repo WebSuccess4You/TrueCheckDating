@@ -47,7 +47,27 @@ describe("Stripe webhook replay boundary", () => {
     );
     expect(report).toContain("existingEntitlement");
     expect(report).not.toContain(".update(entitlementPayload)");
-    expect(membership).toContain("usage_count: 0");
+    expect(membership).toContain("synchronize_membership_subscription");
+    expect(membership).not.toContain("usage_count: 0");
     expect(membership).not.toContain("existingEntitlement?.usage_count");
+  });
+});
+
+describe("individual report purchase configuration", () => {
+  it("grants four report generations within 30 days", () => {
+    expect(webhook).toContain("usage_limit: FULL_REPORT_GENERATION_LIMIT");
+    expect(webhook).toContain("ends_at: addDaysIso(FULL_REPORT_WINDOW_DAYS)");
+    expect(webhook).toContain("usage_count: 0");
+    expect(webhook).toContain('entitlement_type: "case_full_report"');
+  });
+});
+
+describe("approved individual report limits", () => {
+  it("defines exactly four generations and thirty days", async () => {
+    const { FULL_REPORT_GENERATION_LIMIT, FULL_REPORT_WINDOW_DAYS } =
+      await import("./constants");
+
+    expect(FULL_REPORT_GENERATION_LIMIT).toBe(4);
+    expect(FULL_REPORT_WINDOW_DAYS).toBe(30);
   });
 });

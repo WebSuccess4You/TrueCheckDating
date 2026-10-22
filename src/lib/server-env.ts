@@ -21,7 +21,12 @@ const serverEnvironmentSchema = z.object({
     .trim()
     .min(1)
     .default(DEFAULT_OPENAI_CHAT_MODEL),
-  OPENAI_CHAT_TIMEOUT_MS: optionalPositiveInteger(DEFAULT_OPENAI_TIMEOUT_MS),
+  OPENAI_CHAT_TIMEOUT_MS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .max(120_000)
+    .default(DEFAULT_OPENAI_TIMEOUT_MS),
   OPENAI_CHAT_MAX_OUTPUT_TOKENS: optionalPositiveInteger(
     DEFAULT_OPENAI_MAX_OUTPUT_TOKENS,
   ),

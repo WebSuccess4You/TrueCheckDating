@@ -8,14 +8,18 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripeEnvironment } from "@/lib/server-env";
 
 import {
-  ACTIVE_SUBSCRIPTION_STATUSES,
-  FULL_REPORT_REANALYSIS_LIMIT,
+  FULL_REPORT_GENERATION_LIMIT,
   FULL_REPORT_WINDOW_DAYS,
-  MEMBERSHIP_ANALYSIS_LIMIT,
   MONTHLY_MEMBERSHIP_PRODUCT_CODE,
   ONE_TIME_REPORT_PRODUCT_CODE,
 } from "./constants";
+import { getPaidMembershipPeriod } from "./invoice-period";
 import { getStripeClient } from "./stripe";
+
+type StripeEventContext = {
+  id: string;
+  created: number;
+};
 
 function unixToIso(value: number | null | undefined): string | null {
   return value ? new Date(value * 1000).toISOString() : null;
@@ -203,7 +207,7 @@ async function fulfillCheckoutSession(
       source_id: payment.id,
       starts_at: new Date().toISOString(),
       ends_at: addDaysIso(FULL_REPORT_WINDOW_DAYS),
-      usage_limit: FULL_REPORT_REANALYSIS_LIMIT,
+      usage_limit: FULL_REPORT_GENERATION_LIMIT,
       usage_count: 0,
       status: "active",
       metadata: { checkout_session_id: session.id },
@@ -285,14 +289,86 @@ function invoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
   return subscription?.id ?? null;
 }
 
+async function initializePaidMembershipInvoice(
+  invoice: Stripe.Invoice,
+  eventContext: StripeEventContext,
+): Promise<void> {
+  const subscriptionId = invoiceSubscriptionId(invoice);
+  if (!subscriptionId) {
+    throw new Error("Paid invoice is missing its subscription ID.");
+  }
+
+  const { monthlyMembershipPriceId } = getStripeEnvironment();
+  const period = getPaidMembershipPeriod(
+    invoice,
+    subscriptionId,
+    monthlyMembershipPriceId,
+  );
+
+  if (!period) {
+    throw new Error("Paid membership invoice could not be verified.");
+  }
+
+  const subscription =
+    await getStripeClient().subscriptions.retrieve(subscriptionId);
+
+  if (subscription.id !== subscriptionId) {
+    throw new Error("Paid invoice subscription ID mismatch.");
+  }
+
+  const invoiceCustomer =
+    typeof invoice.customer === "string"
+      ? invoice.customer
+      : invoice.customer?.id;
+  const subscriptionCustomer =
+    typeof subscription.customer === "string"
+      ? subscription.customer
+      : subscription.customer.id;
+  if (!invoiceCustomer || invoiceCustomer !== subscriptionCustomer) {
+    throw new Error("Paid invoice customer mismatch.");
+  }
+
+  const subscriptionBillingPeriod = subscriptionPeriod(subscription);
+  if (
+    subscriptionBillingPeriod.start !== period.start ||
+    subscriptionBillingPeriod.end !== period.end
+  ) {
+    throw new Error("Paid invoice billing period does not match subscription.");
+  }
+
+  const internalSubscriptionId = await synchronizeSubscription(
+    subscription,
+    eventContext,
+  );
+  if (internalSubscriptionId === null) return;
+
+  const userId = metadataValue(subscription.metadata, "user_id");
+  if (!userId) throw new Error("Membership user ID missing.");
+
+  const admin = createAdminClient();
+  const { data, error } = await admin.rpc(
+    "initialize_membership_usage_period",
+    {
+      p_subscription_id: internalSubscriptionId,
+      p_user_id: userId,
+      p_period_start: period.start,
+      p_period_end: period.end,
+    },
+  );
+  if (error || typeof data !== "string" || !data) {
+    throw new Error("Could not initialize paid membership usage period.");
+  }
+}
+
 async function refreshInvoiceSubscription(
   invoice: Stripe.Invoice,
+  eventContext: StripeEventContext,
 ): Promise<void> {
   const subscriptionId = invoiceSubscriptionId(invoice);
   if (!subscriptionId) return;
   const subscription =
     await getStripeClient().subscriptions.retrieve(subscriptionId);
-  await synchronizeSubscription(subscription);
+  await synchronizeSubscription(subscription, eventContext);
 }
 
 function subscriptionPeriod(subscription: Stripe.Subscription): {
@@ -315,27 +391,42 @@ function subscriptionPeriod(subscription: Stripe.Subscription): {
 
 async function synchronizeSubscription(
   subscription: Stripe.Subscription,
-): Promise<void> {
+  eventContext: StripeEventContext,
+): Promise<string | null> {
   const userId = metadataValue(subscription.metadata, "user_id");
   const productCode =
     metadataValue(subscription.metadata, "product_code") ??
     MONTHLY_MEMBERSHIP_PRODUCT_CODE;
-  if (!userId)
+
+  if (!userId) {
     throw new Error("Subscription is missing the TrueCheckDating.com user ID.");
+  }
+
+  if (
+    !Number.isSafeInteger(eventContext.created) ||
+    eventContext.created <= 0
+  ) {
+    throw new Error("Invalid Stripe event timestamp.");
+  }
 
   const admin = createAdminClient();
-  const { data: existingProfile } = await admin
+  const { data: existingProfile, error: profileError } = await admin
     .from("user_profiles")
     .select("id")
     .eq("auth_user_id", userId)
     .maybeSingle();
-  if (!existingProfile) {
-    // A Stripe cancellation event can arrive after Build 13 has already
-    // deleted the account. Treat it as successfully irrelevant rather than
-    // recreating user-linked billing records or failing the webhook.
-    return;
+
+  if (profileError) {
+    throw new Error("Could not verify subscription account ownership.");
   }
 
+  if (!existingProfile) {
+    return null;
+  }
+
+  if (productCode !== MONTHLY_MEMBERSHIP_PRODUCT_CODE) {
+    throw new Error("Invalid membership subscription product.");
+  }
   const productId = await getProductId(productCode);
   const customerId =
     typeof subscription.customer === "string"
@@ -343,77 +434,30 @@ async function synchronizeSubscription(
       : subscription.customer.id;
   const period = subscriptionPeriod(subscription);
 
-  const { data: record, error } = await admin
-    .from("subscriptions")
-    .upsert(
-      {
-        user_id: userId,
-        product_id: productId,
-        provider: "stripe",
-        provider_customer_id: customerId,
-        provider_subscription_id: subscription.id,
-        status: subscription.status,
-        current_period_start: period.start,
-        current_period_end: period.end,
-        cancel_at_period_end:
-          subscription.cancel_at_period_end ||
-          (subscription.cancel_at != null &&
-            period.end != null &&
-            unixToIso(subscription.cancel_at) === period.end),
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "provider_subscription_id" },
-    )
-    .select("id")
-    .single();
-  if (error || !record) throw new Error("Could not synchronize subscription.");
+  const { data, error } = await admin.rpc(
+    "synchronize_membership_subscription",
+    {
+      p_user_id: userId,
+      p_product_id: productId,
+      p_provider_customer_id: customerId,
+      p_provider_subscription_id: subscription.id,
+      p_status: subscription.status,
+      p_period_start: period.start,
+      p_period_end: period.end,
+      p_cancel_at_period_end:
+        subscription.cancel_at_period_end ||
+        (subscription.cancel_at != null &&
+          period.end != null &&
+          unixToIso(subscription.cancel_at) === period.end),
+      p_event_created: unixToIso(eventContext.created),
+      p_event_id: eventContext.id,
+    },
+  );
 
-  const entitlementStatus = ACTIVE_SUBSCRIPTION_STATUSES.has(
-    subscription.status,
-  )
-    ? "active"
-    : "inactive";
-  const { data: existingEntitlement } = await admin
-    .from("entitlements")
-    .select("id")
-    .eq("source_type", "subscription")
-    .eq("source_id", record.id)
-    .eq("entitlement_type", "membership")
-    .maybeSingle();
-  const entitlementPayload = {
-    user_id: userId,
-    case_id: null,
-    entitlement_type: "membership",
-    source_type: "subscription",
-    source_id: record.id,
-    starts_at: period.start ?? new Date().toISOString(),
-    ends_at: period.end,
-    usage_limit: MEMBERSHIP_ANALYSIS_LIMIT,
-    status: entitlementStatus,
-    metadata: { provider_subscription_id: subscription.id },
-    updated_at: new Date().toISOString(),
-  };
-  const entitlementResult = existingEntitlement
-    ? await admin
-        .from("entitlements")
-        .update(entitlementPayload)
-        .eq("id", existingEntitlement.id)
-    : await admin.from("entitlements").insert({
-        ...entitlementPayload,
-        usage_count: 0,
-      });
-  if (entitlementResult.error) {
-    const { data: concurrentEntitlement } = await admin
-      .from("entitlements")
-      .select("id")
-      .eq("source_type", "subscription")
-      .eq("source_id", record.id)
-      .eq("entitlement_type", "membership")
-      .maybeSingle();
-    if (!concurrentEntitlement) {
-      throw new Error("Could not synchronize membership entitlement.");
-    }
+  if (error || typeof data !== "string" || !data) {
+    throw new Error("Could not synchronize membership subscription.");
   }
+  return data;
 }
 
 async function handleRefund(charge: Stripe.Charge): Promise<void> {
@@ -471,11 +515,22 @@ export async function processStripeEvent(
       case "customer.subscription.created":
       case "customer.subscription.updated":
       case "customer.subscription.deleted":
-        await synchronizeSubscription(event.data.object);
+        await synchronizeSubscription(event.data.object, {
+          id: event.id,
+          created: event.created,
+        });
         break;
       case "invoice.paid":
+        await initializePaidMembershipInvoice(event.data.object, {
+          id: event.id,
+          created: event.created,
+        });
+        break;
       case "invoice.payment_failed":
-        await refreshInvoiceSubscription(event.data.object);
+        await refreshInvoiceSubscription(event.data.object, {
+          id: event.id,
+          created: event.created,
+        });
         break;
       case "charge.refunded":
         await handleRefund(event.data.object);

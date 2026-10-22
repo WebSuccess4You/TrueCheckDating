@@ -24,6 +24,17 @@ describe("server environment", () => {
     expect(parsed.OPENAI_CHAT_MAX_REQUESTS_PER_HOUR).toBe(3);
   });
 
+  it("accepts the maximum OpenAI timeout of two minutes", () => {
+    const parsed = parseServerEnvironment({ OPENAI_CHAT_TIMEOUT_MS: "120000" });
+    expect(parsed.OPENAI_CHAT_TIMEOUT_MS).toBe(120_000);
+  });
+
+  it("rejects an OpenAI timeout exceeding two minutes", () => {
+    expect(() =>
+      parseServerEnvironment({ OPENAI_CHAT_TIMEOUT_MS: "120001" }),
+    ).toThrow();
+  });
+
   it("rejects invalid non-positive limits", () => {
     expect(() =>
       parseServerEnvironment({ OPENAI_CHAT_MAX_REQUESTS_PER_HOUR: "0" }),
