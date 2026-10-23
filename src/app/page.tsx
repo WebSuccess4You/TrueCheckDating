@@ -292,7 +292,7 @@ export default function Home() {
             <p className={styles.priceTag}>Most direct</p>
             <p className={styles.priceName}>Full individual report</p>
             <p className={styles.price}>
-              $9.99 <span>test price</span>
+              $9.99 <span>one-time</span>
             </p>
             <p className={styles.priceDescription}>
               Complete report for one case with detailed findings and download.

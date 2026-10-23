@@ -49,7 +49,7 @@ export function ReportAccessPanel({
   return (
     <section className={styles.accessPanel} aria-labelledby="access-heading">
       <div>
-        <p className={styles.eyebrow}>Secure Stripe test checkout</p>
+        <p className={styles.eyebrow}>Secure Stripe checkout</p>
         <h3 id="access-heading">Unlock the complete report</h3>
         <p>
           Checkout happens on Stripe. Returning to this site does not unlock the
