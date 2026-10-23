@@ -62,8 +62,8 @@ export function ReportAccessPanel({
           <strong>$9.99</strong>
           <h4>Individual full report</h4>
           <p>
-            Full access for this case, including up to three eligible updates in
-            30 days.
+            One initial Full Report plus three updates within 30 days (four
+            report generations total) for this case.
           </p>
           <CheckoutButton
             productCode={ONE_TIME_REPORT_PRODUCT_CODE}
@@ -77,8 +77,9 @@ export function ReportAccessPanel({
           <strong>$14.99</strong>
           <h4>TrueCheckDating.com membership</h4>
           <p>
-            Up to five active cases and twenty analyses during each billing
-            period.
+            Up to five active cases, 20 Full Report generations and 20
+            successful AI Chat Analyses per billing period. Report and analysis
+            allowances are separate.
           </p>
           <CheckoutButton
             productCode={MONTHLY_MEMBERSHIP_PRODUCT_CODE}
@@ -90,8 +91,8 @@ export function ReportAccessPanel({
         </article>
       </div>
       <p className={styles.smallPrint}>
-        Test pricing is configurable. Stripe handles payment details;
-        TrueCheckDating.com does not store raw card numbers.
+        Stripe handles payment details; TrueCheckDating.com does not store raw
+        card numbers.
       </p>
     </section>
   );
