@@ -30,7 +30,7 @@ const products = [
   {
     name: "Full individual report",
     price: "$9.99",
-    suffix: "test price",
+    suffix: "one-time",
     summary: "A complete combined report for one private case.",
     items: [
       "One initial report plus three updates within 30 days (four generations total)",
@@ -69,9 +69,9 @@ export default function PricingPage() {
           <p className={styles.eyebrow}>Simple starting prices</p>
           <h1>Begin free. Pay for the depth you need.</h1>
           <p className={styles.lead}>
-            These are initial test prices for the private beta and early
-            release. Exact usage limits and pricing may change in response to
-            real customer needs and operating costs.
+            Choose a one-time report for one private case or a monthly
+            membership with separate report and AI analysis allowances. See the
+            included limits below.
           </p>
         </div>
       </section>

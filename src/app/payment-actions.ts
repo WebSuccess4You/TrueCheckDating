@@ -171,7 +171,7 @@ export async function createCheckoutSessionAction(
     return {
       status: "error",
       message:
-        "Secure checkout could not be started. Confirm the Build 11 Stripe test settings and try again.",
+        "Secure checkout could not be started. Please try again shortly or contact support.",
     };
   }
 
