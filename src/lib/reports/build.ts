@@ -63,7 +63,9 @@ export function buildFinalReportBody({
   }
 
   const warningSigns: ReportFinding[] = [];
-  for (const finding of chatAnalysis?.red_flags ?? []) {
+  for (const finding of (chatAnalysis?.status === "completed"
+    ? chatAnalysis.red_flags
+    : []) ?? []) {
     warningSigns.push({
       source: "Chat Analyzer",
       category: finding.category.replaceAll("_", " "),
@@ -73,9 +75,12 @@ export function buildFinalReportBody({
       interpretation: finding.why_it_matters,
     });
   }
-  for (const finding of profileCheck?.contradictions ?? []) {
+  for (const finding of (profileCheck?.status === "completed"
+    ? profileCheck.contradictions
+    : []) ?? []) {
     const isFinancial = finding.key === "financialRequests";
     const isVerification = finding.key === "verificationCooperation";
+    const isSocialHistory = finding.key === "socialProfileHistory";
     warningSigns.push({
       source: "Profile Consistency Check",
       category: finding.label,
@@ -85,15 +90,21 @@ export function buildFinalReportBody({
         ? "A financial request was recorded."
         : isVerification
           ? "The recorded verification cooperation raises concern."
-          : `${finding.label} was recorded as inconsistent.`,
+          : isSocialHistory
+            ? "The recorded social-profile history warrants further context."
+            : `${finding.label} was recorded as inconsistent.`,
       interpretation: isFinancial
         ? "Pause financial commitments until the request and important claims are independently checked."
         : isVerification
           ? "A delayed or unclear response to a reasonable request leaves identity unverified."
-          : "An unexplained inconsistency increases uncertainty and should be independently checked.",
+          : isSocialHistory
+            ? "Limited, recent, or absent social-profile history does not by itself establish a contradiction or deception. Review the recorded answer and seek independent context."
+            : "An unexplained inconsistency increases uncertainty and should be independently checked.",
     });
   }
-  for (const observation of videoCheck?.avoidance_patterns ?? []) {
+  for (const observation of (videoCheck?.status === "completed"
+    ? videoCheck.avoidance_patterns
+    : []) ?? []) {
     warningSigns.push({
       source: "Video Call Verifier",
       category: "verification behavior",
@@ -125,21 +136,27 @@ export function buildFinalReportBody({
   }
 
   const protectiveSignals: ReportProtectiveSignal[] = [];
-  for (const signal of chatAnalysis?.protective_signals ?? []) {
+  for (const signal of (chatAnalysis?.status === "completed"
+    ? chatAnalysis.protective_signals
+    : []) ?? []) {
     protectiveSignals.push({
       source: "Chat Analyzer",
       evidence: signal.evidence_excerpt,
       observation: signal.observation,
     });
   }
-  for (const signal of profileCheck?.protective_signals ?? []) {
+  for (const signal of (profileCheck?.status === "completed"
+    ? profileCheck.protective_signals
+    : []) ?? []) {
     protectiveSignals.push({
       source: "Profile Consistency Check",
       evidence: `Recorded answer: ${signal.answer.replaceAll("_", " ")}`,
       observation: `${signal.label} was recorded as reasonably consistent.`,
     });
   }
-  for (const signal of videoCheck?.protective_signals ?? []) {
+  for (const signal of (videoCheck?.status === "completed"
+    ? videoCheck.protective_signals
+    : []) ?? []) {
     protectiveSignals.push({
       source: "Video Call Verifier",
       evidence: signal,
@@ -148,6 +165,7 @@ export function buildFinalReportBody({
   }
   if (
     imageCheck?.status === "completed" &&
+    imageCheck.result_category !== "unclear" &&
     (imageCheck.component_score ?? 100) <= 20
   ) {
     protectiveSignals.push({
@@ -160,7 +178,9 @@ export function buildFinalReportBody({
   }
 
   const aiRecommendations: ReportRecommendation[] = (
-    chatAnalysis?.recommended_actions ?? []
+    (chatAnalysis?.status === "completed"
+      ? chatAnalysis.recommended_actions
+      : []) ?? []
   ).map((item) => ({
     priority: item.priority,
     action: item.action,
@@ -174,7 +194,9 @@ export function buildFinalReportBody({
   const limitations = uniqueBy(
     [
       ...assessment.limitations,
-      ...(chatAnalysis?.limitations ?? []),
+      ...((chatAnalysis?.status === "completed"
+        ? chatAnalysis.limitations
+        : []) ?? []),
       "This report uses user-supplied information and automated analysis; it does not establish legal identity, intent, criminality, genuineness, or safety.",
       "Private notes and the full raw conversation are intentionally excluded from this export.",
     ],

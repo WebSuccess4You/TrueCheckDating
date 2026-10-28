@@ -128,6 +128,101 @@ describe("report evidence labels for Profile and Video checks", () => {
     created_at: completedAt,
     updated_at: completedAt,
   };
+  it("excludes leftover findings from unfinished checks while preserving chat evidence", () => {
+    const report = buildFinalReportBody({
+      caseRecord,
+      assessment,
+      chatAnalysis,
+      profileCheck: {
+        ...profileCheck,
+        status: "in_progress",
+        completed_at: null,
+        contradictions: [
+          {
+            key: "verificationCooperation",
+            label: "Verification cooperation",
+            answer: "Frequently avoids or delays verification",
+            score: 75,
+            severity: "high",
+          },
+        ],
+        protective_signals: [
+          {
+            key: "nameConsistency",
+            label: "Name consistency",
+            answer: "Consistent",
+          },
+        ],
+      },
+      videoCheck: {
+        ...videoCheck,
+        status: "in_progress",
+        completed_at: null,
+        avoidance_patterns: ["Repeated requests for a live call were avoided."],
+        protective_signals: ["Ordinary boundaries were respected."],
+      },
+      imageCheck: null,
+      generatedAt: "2026-10-28T12:00:00Z",
+    });
+
+    expect(report.warningSigns).toHaveLength(1);
+    expect(report.warningSigns[0].source).toBe("Chat Analyzer");
+    expect(report.protectiveSignals).toHaveLength(0);
+    for (const source of ["Profile Consistency Check", "Video Call Verifier"]) {
+      expect(
+        report.evidenceReviewed.find((item) => item.source === source)?.status,
+      ).toBe("Not available");
+    }
+  });
+
+  it("describes limited social history without asserting an inconsistency", () => {
+    const report = buildFinalReportBody({
+      caseRecord,
+      assessment,
+      chatAnalysis: null,
+      profileCheck: {
+        ...profileCheck,
+        contradictions: [
+          {
+            key: "socialProfileHistory",
+            label: "Social-profile history",
+            answer: "Limited history or sparse activity",
+            score: 45,
+            severity: "moderate",
+          },
+        ],
+      },
+      videoCheck: null,
+      imageCheck: null,
+      generatedAt: "2026-10-28T12:00:00Z",
+    });
+
+    expect(report.warningSigns[0].evidence).toContain("Limited history");
+    expect(report.warningSigns[0].observation).not.toContain("inconsistent");
+    expect(report.warningSigns[0].interpretation).toContain(
+      "does not by itself establish a contradiction or deception",
+    );
+  });
+
+  it("keeps generic precautions neutral when financial pressure is present", () => {
+    const report = buildFinalReportBody({
+      caseRecord,
+      assessment,
+      chatAnalysis,
+      profileCheck: null,
+      videoCheck: null,
+      imageCheck: null,
+      generatedAt: "2026-10-28T12:00:00Z",
+    });
+
+    expect(report.warningSigns[0].category).toBe("financial pressure");
+    const reasons = report.recommendations.map((item) => item.reason).join(" ");
+    expect(reasons).not.toContain("This recommendation does not mean");
+    expect(reasons).toContain("whether or not financial pressure");
+    expect(reasons).toContain("whether or not video avoidance");
+    expect(report.contentVersion).toBe("2026-10-28.1");
+  });
+
   it("separates evidence, observation, interpretation, and limitations", () => {
     const report = buildFinalReportBody({
       caseRecord,
@@ -364,5 +459,44 @@ describe("report recommendation priorities", () => {
       expect(recommendation.priority).toBe("moderate");
       expect(recommendation.reason).toMatch(/^General precaution:/);
     }
+  });
+});
+
+describe("report image eligibility", () => {
+  it("excludes unclear image findings even when a leftover score is low", () => {
+    const report = buildFinalReportBody({
+      caseRecord,
+      assessment,
+      chatAnalysis: null,
+      profileCheck: null,
+      videoCheck: null,
+      imageCheck: {
+        id: "image-check-1",
+        case_id: "case-1",
+        auth_user_id: "user-1",
+        status: "completed",
+        result_category: "unclear",
+        source_links: [],
+        notes: null,
+        component_score: 10,
+        evidence_completeness: 0,
+        summary: "Leftover image summary.",
+        version: "image-test-1",
+        safety_acknowledged_at: null,
+        completed_at: "2026-10-28T12:00:00Z",
+        created_at: "2026-10-28T12:00:00Z",
+        updated_at: "2026-10-28T12:00:00Z",
+      },
+      generatedAt: "2026-10-28T12:00:00Z",
+    });
+
+    expect(report.warningSigns).toHaveLength(0);
+    expect(report.protectiveSignals).toHaveLength(0);
+    expect(
+      report.evidenceReviewed.find(
+        (item) => item.source === "Guided Reverse Image Checker",
+      )?.status,
+    ).toBe("Not available");
+    expect(JSON.stringify(report)).not.toContain("Leftover image summary.");
   });
 });
