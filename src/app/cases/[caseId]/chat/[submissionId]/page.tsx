@@ -29,7 +29,7 @@ export default async function SavedChatSubmissionPage({
   searchParams,
 }: {
   params: Promise<{ caseId: string; submissionId: string }>;
-  searchParams: Promise<{ message?: string }>;
+  searchParams: Promise<{ message?: string; view?: string }>;
 }) {
   const user = await requireUser();
   const { caseId, submissionId } = await params;
@@ -55,7 +55,10 @@ export default async function SavedChatSubmissionPage({
       "The encrypted text could not be opened with the current server key. The submission remains protected in storage.";
   }
 
-  const preview = savedText?.slice(0, CHAT_PREVIEW_CHARACTERS) ?? null;
+  const showCompleteText = query.view === "full";
+  const preview = showCompleteText
+    ? savedText
+    : (savedText?.slice(0, CHAT_PREVIEW_CHARACTERS) ?? null);
   const omitted = savedText
     ? Math.max(0, savedText.length - CHAT_PREVIEW_CHARACTERS)
     : 0;
@@ -146,7 +149,11 @@ export default async function SavedChatSubmissionPage({
         </article>
       </section>
 
-      <details className={styles.previewDisclosure}>
+      <details
+        id="saved-text"
+        className={styles.previewDisclosure}
+        open={showCompleteText}
+      >
         <summary>View a private preview of the saved text</summary>
         <p>
           The preview is decrypted only on the server for the signed-in case
@@ -158,8 +165,24 @@ export default async function SavedChatSubmissionPage({
           </p>
         ) : preview ? (
           <>
+            <p>
+              {showCompleteText || omitted === 0
+                ? "Showing the complete saved text."
+                : `Showing the first ${CHAT_PREVIEW_CHARACTERS.toLocaleString("en-US")} characters.`}
+            </p>
+            {omitted > 0 ? (
+              <p>
+                <Link
+                  href={`/cases/${caseId}/chat/${submissionId}${showCompleteText ? "" : "?view=full"}#saved-text`}
+                >
+                  {showCompleteText
+                    ? "View shortened preview"
+                    : "View complete saved text"}
+                </Link>
+              </p>
+            ) : null}
             <SavedTextPreview text={preview} />
-            {omitted ? (
+            {omitted > 0 && !showCompleteText ? (
               <p>
                 Preview shortened by {omitted.toLocaleString()} characters. The
                 complete encrypted submission remains stored.
