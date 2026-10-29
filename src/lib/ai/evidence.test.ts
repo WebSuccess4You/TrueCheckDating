@@ -208,3 +208,21 @@ describe("score evidence validation", () => {
     ).toBe(false);
   });
 });
+
+describe("letter quotation accuracy", () => {
+  it("rejects omitted words in a letter quotation", () => {
+    const letter = "none of that will happen unless you search for me";
+    const altered = "none will happen unless you search for me";
+    expect(excerptAppearsInTranscript(letter, letter)).toBe(true);
+    expect(excerptAppearsInTranscript(altered, letter)).toBe(false);
+    const analysis: ChatAnalysisOutput = {
+      ...result,
+      red_flags: [{ ...result.red_flags[0], evidence_excerpt: altered }],
+      protective_signals: [],
+    };
+    expect(validateEvidenceExcerpts(analysis, letter)).toEqual({
+      valid: false,
+      invalidExcerpt: altered,
+    });
+  });
+});
