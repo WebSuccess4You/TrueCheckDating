@@ -52,6 +52,120 @@ describe("Build 17 Stripe webhook integration", () => {
     });
   });
 
+  it.each([
+    {
+      eventType: "invoice.payment_failed",
+      status: "past_due",
+      cancelAtPeriodEnd: false,
+    },
+    {
+      eventType: "customer.subscription.deleted",
+      status: "canceled",
+      cancelAtPeriodEnd: false,
+    },
+    {
+      eventType: "customer.subscription.updated",
+      status: "active",
+      cancelAtPeriodEnd: true,
+    },
+  ])(
+    "synchronizes $eventType without creating a new allowance",
+    async ({ eventType, status, cancelAtPeriodEnd }) => {
+      const eventId = `evt_lifecycle_${status}`;
+      const subscription = {
+        id: "sub_lifecycle_test",
+        customer: "cus_lifecycle_test",
+        status,
+        metadata: {
+          user_id: "user_test",
+          product_code: "monthly_membership",
+        },
+        cancel_at_period_end: cancelAtPeriodEnd,
+        cancel_at: null,
+        items: {
+          data: [
+            {
+              current_period_start: 1790812800,
+              current_period_end: 1793491200,
+            },
+          ],
+        },
+      };
+
+      const retrieve = vi.fn().mockResolvedValue(subscription);
+      mocks.getStripeClient.mockReturnValue({
+        subscriptions: { retrieve },
+      });
+
+      const tables = new Map<string, ReturnType<typeof mockQuery>>([
+        ["products", mockQuery({ data: { id: "prod_membership_test" } })],
+        ["user_profiles", mockQuery({ data: { id: "profile_test" } })],
+        [
+          "stripe_webhook_events",
+          mockQuery({
+            data: { provider_event_id: eventId },
+          }),
+        ],
+      ]);
+      mocks.from.mockImplementation(
+        (table: string) => tables.get(table) ?? mockQuery(),
+      );
+      mocks.rpc.mockImplementation((name: string) =>
+        Promise.resolve({
+          data:
+            name === "synchronize_membership_subscription"
+              ? "subscription_record_test"
+              : "new",
+          error: null,
+        }),
+      );
+
+      const event = {
+        id: eventId,
+        type: eventType,
+        created: 1790812800,
+        data: {
+          object:
+            eventType === "invoice.payment_failed"
+              ? {
+                  customer: subscription.customer,
+                  parent: {
+                    subscription_details: {
+                      subscription: subscription.id,
+                    },
+                  },
+                }
+              : subscription,
+        },
+      };
+
+      await expect(processStripeEvent(event as never)).resolves.toBe(
+        "processed",
+      );
+
+      expect(mocks.rpc).toHaveBeenCalledWith(
+        "synchronize_membership_subscription",
+        expect.objectContaining({
+          p_user_id: "user_test",
+          p_provider_subscription_id: subscription.id,
+          p_status: status,
+          p_cancel_at_period_end: cancelAtPeriodEnd,
+          p_event_id: eventId,
+        }),
+      );
+      expect(mocks.rpc).not.toHaveBeenCalledWith(
+        "initialize_membership_usage_period",
+        expect.anything(),
+      );
+
+      if (eventType === "invoice.payment_failed") {
+        expect(retrieve).toHaveBeenCalledWith(subscription.id);
+      } else {
+        expect(retrieve).not.toHaveBeenCalled();
+      }
+    },
+  );
+
   it("skips an already completed Stripe event", async () => {
     const rpc = vi.fn().mockResolvedValue({
       data: "completed",
